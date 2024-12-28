@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* KEYFRAMES */
+/* index.css or a global file */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; /* optional but common */
+}
+
+/* Move each dot or letter in a wave up/down */
+@keyframes wave {
+  0%, 40%, 100% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Basic fade/slide up */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeOutDown {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/* Utility classes */
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease forwards;
+}
+.animate-fadeOutDown {
+  animation: fadeOutDown 0.5s ease forwards;
+}
+
+/* Loader dots (we'll transform them in a wave) */
+.loader-dot {
+  display: inline-block;
+  animation: wave 1s infinite;
+}
+.loader-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loader-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+.loader-dot:nth-child(4) {
+  animation-delay: 0.6s;
+}
