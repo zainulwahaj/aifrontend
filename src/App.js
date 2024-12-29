@@ -17,13 +17,14 @@ function App() {
     setLoading(true);
     setResults([]);
     setErrorMsg('');
-
+  
     try {
-      const response = await axios.post('http://localhost:5000/analyse', {
+      const response = await axios.post('https://8759-39-58-160-102.ngrok-free.app/analyse', {
         url,
         method,
         depth: Number(depth),
       });
+      console.log(response)
       setResults(response.data);
     } catch (err) {
       if (err.response && err.response.data) {
@@ -35,6 +36,7 @@ function App() {
       setLoading(false);
     }
   };
+  
 
   // Reset for new crawl or error
   const handleReset = () => {
