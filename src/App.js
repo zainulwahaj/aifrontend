@@ -19,7 +19,7 @@ function App() {
     setErrorMsg('');
   
     try {
-      const response = await axios.post('https://8759-39-58-160-102.ngrok-free.app/analyse', {
+      const response = await axios.post('http://143.110.243.146:5959/analyse', {
         url,
         method,
         depth: Number(depth),
