@@ -26,7 +26,7 @@ function App() {
     setJobId(null);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5959/analyse', {
+      const response = await axios.post('https://microcloud.tech/analyse', {
         urls: [url],  // Ensure 'urls' is an array
         method,
         depth: Number(depth),
