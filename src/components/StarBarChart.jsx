@@ -1,3 +1,5 @@
+// src/components/StarBarChart.jsx
+
 import React, { useMemo } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
@@ -37,7 +39,7 @@ const StarBarChart = ({ data }) => {
         >
           <CartesianGrid strokeDasharray="3 3" stroke="#555" />
           <XAxis
-            dataKey="star"
+            dataKey="star"  
             tick={{ fontSize: 14, fill: '#fff' }}
             label={{ value: 'Star Rating', position: 'bottom', fill: '#fff', fontSize: 16, offset: 10 }}
           />

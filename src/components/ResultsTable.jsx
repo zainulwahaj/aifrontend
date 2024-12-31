@@ -1,3 +1,5 @@
+// src/components/ResultsTable.jsx
+
 import React, { useState, useMemo } from 'react';
 import { FaFilter } from 'react-icons/fa';
 
@@ -76,14 +78,14 @@ const ResultsTable = ({ data }) => {
         </p>
       ) : (
         <div className="overflow-x-auto border border-gray-300 rounded-xl shadow-2xl">
-          <table className="min-w-full bg-black text-gray-200">
+          <table className="min-w-full table-fixed bg-black text-gray-200">
             <thead className="bg-gradient-to-r from-black to-red-900 text-white">
               <tr>
-                <th className="py-3 px-4 text-left font-semibold">URL</th>
-                <th className="py-3 px-4 text-left font-semibold">Star Rating</th>
-                <th className="py-3 px-4 text-left font-semibold">Sentiment</th>
-                <th className="py-3 px-4 text-left font-semibold">Confidence</th>
-                <th className="py-3 px-4 text-left font-semibold">Summary</th>
+                <th className="py-3 px-4 text-left font-semibold" style={{ width: '20%' }}>URL</th>
+                <th className="py-3 px-4 text-left font-semibold" style={{ width: '10%' }}>Star Rating</th>
+                <th className="py-3 px-4 text-left font-semibold" style={{ width: '10%' }}>Sentiment</th>
+                <th className="py-3 px-4 text-left font-semibold" style={{ width: '10%' }}>Confidence</th>
+                <th className="py-3 px-4 text-left font-semibold" style={{ width: '50%' }}>Summary</th>
               </tr>
             </thead>
             <tbody>
@@ -92,7 +94,11 @@ const ResultsTable = ({ data }) => {
                   key={idx}
                   className="border-b border-gray-700 hover:bg-gray-800 transition"
                 >
-                  <td className="py-2 px-4">{item.url}</td>
+                  <td className="py-2 px-4">
+                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="underline text-blue-400">
+                      {item.url}
+                    </a>
+                  </td>
                   <td className="py-2 px-4">{item.star_label}</td>
                   <td className="py-2 px-4">{item.sentiment_label}</td>
                   <td className="py-2 px-4">{(item.sentiment_score || 0).toFixed(3)}</td>

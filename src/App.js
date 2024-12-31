@@ -1,15 +1,21 @@
-import React, { useState, useMemo } from 'react';
+// src/App.jsx
+
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import InputForm from './components/InputForm';
 import ResultsTable from './components/ResultsTable';
-import BarChart from './components/BarChart';
+import StarBarChart from './components/StarBarChart';
+import ConfidenceBarChart from './components/ConfidenceBarChart'; // Import the new component
 import { FaRobot } from 'react-icons/fa';
+import 'react-tooltip/dist/react-tooltip.css';
 
 function App() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [formHidden, setFormHidden] = useState(false);
+  const [jobId, setJobId] = useState(null);
+  const pollingRef = useRef(null);
 
   // Start BFS or DFS
   const handleAnalyse = async ({ url, method, depth }) => {
@@ -17,26 +23,79 @@ function App() {
     setLoading(true);
     setResults([]);
     setErrorMsg('');
-  
+    setJobId(null);
+
     try {
-      const response = await axios.post('https://microcloud.tech//analyse', {
-        url,
+      const response = await axios.post('http://127.0.0.1:5959/analyse', {
+        urls: [url],  // Ensure 'urls' is an array
         method,
         depth: Number(depth),
       });
-      console.log(response)
-      setResults(response.data);
+      console.log(response);
+      const receivedJobId = response.data.job_id;
+      setJobId(receivedJobId);
     } catch (err) {
       if (err.response && err.response.data) {
         setErrorMsg(err.response.data.error || 'Server error occurred');
       } else {
         setErrorMsg(err.message || 'Network error');
       }
-    } finally {
       setLoading(false);
+      setFormHidden(false);
     }
   };
-  
+
+  // Polling to fetch job status
+  useEffect(() => {
+    if (!jobId) return;
+
+    const fetchStatus = async () => {
+      try {
+        const response = await axios.get(`http://127.0.0.1:5959/status/${jobId}`);
+        const { status, results: newResults, error } = response.data;
+
+        if (error) {
+          setErrorMsg(error);
+          setLoading(false);
+          clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          setFormHidden(false);
+          return;
+        }
+
+        setResults(newResults);
+
+        if (status === 'completed' || status === 'failed') {
+          setLoading(false);
+          clearInterval(pollingRef.current);
+          pollingRef.current = null;
+          if (status === 'failed') {
+            setErrorMsg('Crawl job failed.');
+            setFormHidden(false);
+          }
+        }
+      } catch (err) {
+        setErrorMsg('Error fetching job status.');
+        setLoading(false);
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        setFormHidden(false);
+      }
+    };
+
+    // Start polling every 2 seconds
+    pollingRef.current = setInterval(fetchStatus, 2000);
+
+    // Fetch immediately
+    fetchStatus();
+
+    // Cleanup on unmount
+    return () => {
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+      }
+    };
+  }, [jobId]);
 
   // Reset for new crawl or error
   const handleReset = () => {
@@ -44,6 +103,11 @@ function App() {
     setLoading(false);
     setErrorMsg('');
     setFormHidden(false);
+    setJobId(null);
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
   };
 
   // Download CSV client-side
@@ -51,13 +115,13 @@ function App() {
     if (results.length === 0) return;
 
     let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += 'URL,Star Label,Sentiment Label,Confidence,Summary\n';
+    csvContent += 'URL,Star Rating,Sentiment Label,Confidence,Summary\n';
     results.forEach((item) => {
       const row = [
-        item.url,
-        item.star_label,
-        item.sentiment_label,
-        item.sentiment_score,
+        `"${item.url}"`,
+        `"${item.star_label}"`,
+        `"${item.sentiment_label}"`,
+        `${(item.sentiment_score || 0).toFixed(3)}`,
         `"${item.summary?.replace(/"/g, '""')}"`,
       ].join(',');
       csvContent += row + '\n';
@@ -88,8 +152,8 @@ function App() {
       </header>
 
       <div className="max-w-6xl mx-auto px-4">
-        {/* Show Input Form only if there are no results */}
-        {!results.length && !loading && !errorMsg && (
+        {/* Show Input Form only if there are no results and not loading */}
+        {!jobId && !loading && !errorMsg && (
           <InputForm onSubmit={handleAnalyse} hidden={formHidden} />
         )}
 
@@ -122,7 +186,7 @@ function App() {
         )}
 
         {/* Results Section */}
-        {results.length > 0 && !loading && (
+        {results.length > 0 && (
           <div
             className="mt-4 bg-black/70 backdrop-blur-xl p-6 rounded-xl shadow-2xl border border-red-800"
           >
@@ -145,10 +209,13 @@ function App() {
             {/* Results Table */}
             <ResultsTable data={results} />
 
-            {/* Bar Chart */}
+            {/* Star Bar Chart */}
             <div className="mt-8">
-              <BarChart data={results} />
+              <StarBarChart data={results} />
             </div>
+
+            {/* Confidence Bar Chart */}
+            <ConfidenceBarChart data={results} />
           </div>
         )}
       </div>
