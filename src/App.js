@@ -51,7 +51,7 @@ function App() {
 
     const fetchStatus = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:5959/status/${jobId}`);
+        const response = await axios.get(`https://microcloud.tech/status/${jobId}`);
         const { status, results: newResults, error } = response.data;
 
         if (error) {
