@@ -147,7 +147,7 @@ function App() {
           ScrapeVision
         </h1>
         <p className="text-sm text-gray-300 mt-2 font-medium">
-          Dark, Stylish, and Animated Crawler
+          I miss sir afaq :/
         </p>
       </header>
 
