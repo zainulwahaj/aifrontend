@@ -147,7 +147,7 @@ function App() {
           ScrapeVision
         </h1>
         <p className="text-sm text-gray-300 mt-2 font-medium">
-          I miss sir afaq :/
+          AI Based WebScraper ☝️🤓 
         </p>
       </header>
 
