@@ -26,7 +26,7 @@ function App() {
     setJobId(null);
 
     try {
-      const response = await axios.post('https://microcloud.tech/analyse', {
+      const response = await axios.post('https://143.198.191.190/analyse', {
         urls: [url],  // Ensure 'urls' is an array
         method,
         depth: Number(depth),
@@ -51,7 +51,7 @@ function App() {
 
     const fetchStatus = async () => {
       try {
-        const response = await axios.get(`https://microcloud.tech/status/${jobId}`);
+        const response = await axios.get(`https://143.198.191.190/status/${jobId}`);
         const { status, results: newResults, error } = response.data;
 
         if (error) {
