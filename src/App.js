@@ -26,7 +26,7 @@ function App() {
     setJobId(null);
 
     try {
-      const response = await axios.post('http://127.0.0.1:5959/analyse', {
+      const response = await axios.post('https://scrapvision.onrender.com/analyse', {
         urls: [url],  // Ensure 'urls' is an array
         method,
         depth: Number(depth),
@@ -51,7 +51,7 @@ function App() {
 
     const fetchStatus = async () => {
       try {
-        const response = await axios.get(`http://127.0.0.1:5959/status/${jobId}`);
+        const response = await axios.get(`https://scrapvision.onrender.com/status/${jobId}`);
         const { status, results: newResults, error } = response.data;
 
         if (error) {
