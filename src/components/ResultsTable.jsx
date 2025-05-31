@@ -1,116 +1,134 @@
-// src/components/ResultsTable.jsx
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Star, ThumbsUp, ThumbsDown, MessageSquare } from 'lucide-react';
 
-import React, { useState, useMemo } from 'react';
-import { FaFilter } from 'react-icons/fa';
+const ResultsTable = ({ data, theme }) => {
+  const getStarColor = (stars) => {
+    const num = parseInt(stars);
+    if (num >= 4) return 'text-yellow-400';
+    if (num >= 3) return 'text-yellow-500';
+    if (num >= 2) return 'text-orange-500';
+    return 'text-red-500';
+  };
 
-const ResultsTable = ({ data }) => {
-  const [filterStar, setFilterStar] = useState('all');
-  const [filterSentiment, setFilterSentiment] = useState('all');
+  const getSentimentColor = (sentiment) => {
+    switch (sentiment.toLowerCase()) {
+      case 'positive':
+        return 'text-green-500';
+      case 'negative':
+        return 'text-red-500';
+      default:
+        return 'text-gray-500';
+    }
+  };
 
-  // Filter logic
-  const filteredData = useMemo(() => {
-    return data.filter(item => {
-      let starPass = true;
-      let sentimentPass = true;
-
-      if (filterStar !== 'all') {
-        starPass = (item.star_label === filterStar);
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
       }
-      if (filterSentiment !== 'all') {
-        sentimentPass = (item.sentiment_label === filterSentiment);
-      }
+    }
+  };
 
-      return starPass && sentimentPass;
-    });
-  }, [data, filterStar, filterSentiment]);
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
 
   return (
-    <div className="w-full animate-fadeInUp">
-      {/* Filters */}
-      <div className="flex items-center justify-between mb-4 space-x-4">
-        {/* Star Filter */}
-        <div className="flex items-center space-x-2">
-          <label className="text-gray-200 font-medium">Star Rating</label>
-          <div className="relative">
-            <FaFilter className="absolute left-2 top-2 text-gray-400" />
-            <select
-              className="pl-8 pr-3 py-1 rounded border border-gray-300
-                         focus:outline-none focus:ring-2 focus:ring-red-500
-                         transition duration-300 text-gray-700"
-              value={filterStar}
-              onChange={(e) => setFilterStar(e.target.value)}
+    <motion.div
+      variants={container}
+      initial="hidden"
+      animate="show"
+      className="overflow-x-auto"
+    >
+      <table className="w-full">
+        <thead>
+          <tr className={`border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              URL
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              Rating
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              Sentiment
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              Confidence
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+              Summary
+            </th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+          {data.map((item, index) => (
+            <motion.tr
+              key={index}
+              variants={item}
+              className={`${
+                theme === 'dark'
+                  ? 'hover:bg-gray-800/50'
+                  : 'hover:bg-gray-50'
+              } transition-colors duration-200`}
             >
-              <option value="all">All</option>
-              <option value="1 star">1 star</option>
-              <option value="2 stars">2 stars</option>
-              <option value="3 stars">3 stars</option>
-              <option value="4 stars">4 stars</option>
-              <option value="5 stars">5 stars</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Sentiment Filter */}
-        <div className="flex items-center space-x-2">
-          <label className="text-gray-200 font-medium">Sentiment</label>
-          <div className="relative">
-            <FaFilter className="absolute left-2 top-2 text-gray-400" />
-            <select
-              className="pl-8 pr-3 py-1 rounded border border-gray-300
-                         focus:outline-none focus:ring-2 focus:ring-red-500
-                         transition duration-300 text-gray-700"
-              value={filterSentiment}
-              onChange={(e) => setFilterSentiment(e.target.value)}
-            >
-              <option value="all">All</option>
-              <option value="NEGATIVE">NEGATIVE</option>
-              <option value="NEUTRAL">NEUTRAL</option>
-              <option value="POSITIVE">POSITIVE</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Filtered Results */}
-      {filteredData.length === 0 ? (
-        <p className="text-center text-gray-300 mt-4">
-          No results match the filters.
-        </p>
-      ) : (
-        <div className="overflow-x-auto border border-gray-300 rounded-xl shadow-2xl">
-          <table className="min-w-full table-fixed bg-black text-gray-200">
-            <thead className="bg-gradient-to-r from-black to-red-900 text-white">
-              <tr>
-                <th className="py-3 px-4 text-left font-semibold" style={{ width: '20%' }}>URL</th>
-                <th className="py-3 px-4 text-left font-semibold" style={{ width: '10%' }}>Star Rating</th>
-                <th className="py-3 px-4 text-left font-semibold" style={{ width: '10%' }}>Sentiment</th>
-                <th className="py-3 px-4 text-left font-semibold" style={{ width: '10%' }}>Confidence</th>
-                <th className="py-3 px-4 text-left font-semibold" style={{ width: '50%' }}>Summary</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((item, idx) => (
-                <tr
-                  key={idx}
-                  className="border-b border-gray-700 hover:bg-gray-800 transition"
-                >
-                  <td className="py-2 px-4">
-                    <a href={item.url} target="_blank" rel="noopener noreferrer" className="underline text-blue-400">
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="text-sm font-medium">
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`hover:text-blue-500 transition-colors duration-200 ${
+                        theme === 'dark' ? 'text-blue-400' : 'text-blue-600'
+                      }`}
+                    >
                       {item.url}
                     </a>
-                  </td>
-                  <td className="py-2 px-4">{item.star_label}</td>
-                  <td className="py-2 px-4">{item.sentiment_label}</td>
-                  <td className="py-2 px-4">{(item.sentiment_score || 0).toFixed(3)}</td>
-                  <td className="py-2 px-4">{item.summary}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <Star className={`h-5 w-5 ${getStarColor(item.star_label)}`} />
+                  <span className="ml-2 text-sm font-medium">
+                    {item.star_label}
+                  </span>
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  {item.sentiment_label.toLowerCase() === 'positive' ? (
+                    <ThumbsUp className="h-5 w-5 text-green-500" />
+                  ) : item.sentiment_label.toLowerCase() === 'negative' ? (
+                    <ThumbsDown className="h-5 w-5 text-red-500" />
+                  ) : (
+                    <MessageSquare className="h-5 w-5 text-gray-500" />
+                  )}
+                  <span className={`ml-2 text-sm font-medium ${getSentimentColor(item.sentiment_label)}`}>
+                    {item.sentiment_label}
+                  </span>
+                </div>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="text-sm">
+                  {(item.sentiment_score * 100).toFixed(1)}%
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="text-sm max-w-md">
+                  {item.summary}
+                </div>
+              </td>
+            </motion.tr>
+          ))}
+        </tbody>
+      </table>
+    </motion.div>
   );
 };
 
-export default ResultsTable;
+export default ResultsTable; 

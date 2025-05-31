@@ -1,68 +1,116 @@
-// src/components/StarBarChart.jsx
-
 import React, { useMemo } from 'react';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
-} from 'recharts';
+import { motion } from 'framer-motion';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Star } from 'lucide-react';
 
-const StarBarChart = ({ data }) => {
-  // Tally star labels into { '1 star': X, '2 stars': Y, ... }
-  const chartData = useMemo(() => {
-    const counts = { '1 star': 0, '2 stars': 0, '3 stars': 0, '4 stars': 0, '5 stars': 0 };
-    data.forEach(item => {
-      if (counts[item.star_label] !== undefined) {
-        counts[item.star_label]++;
+const StarBarChart = ({ data, theme }) => {
+  const processedData = useMemo(() => {
+    const starCounts = {
+      '1 star': 0,
+      '2 stars': 0,
+      '3 stars': 0,
+      '4 stars': 0,
+      '5 stars': 0,
+    };
+
+    data.forEach((item) => {
+      const starLabel = item.star_label.toLowerCase();
+      if (starCounts.hasOwnProperty(starLabel)) {
+        starCounts[starLabel]++;
       }
     });
-    return Object.keys(counts).map(star => ({
-      star,
-      count: counts[star],
+
+    return Object.entries(starCounts).map(([label, count]) => ({
+      label,
+      count,
     }));
   }, [data]);
 
-  // Define custom colors for each rating
-  const starColors = {
-    '1 star': '#ef4444', // red-500
-    '2 stars': '#f59e0b', // amber-500
-    '3 stars': '#eab308', // yellow-500
-    '4 stars': '#10b981', // green-500
-    '5 stars': '#3b82f6', // blue-500
+  const getStarColor = (stars) => {
+    const num = parseInt(stars);
+    if (num >= 4) return '#fbbf24'; // yellow-400
+    if (num >= 3) return '#f59e0b'; // yellow-500
+    if (num >= 2) return '#f97316'; // orange-500
+    return '#ef4444'; // red-500
+  };
+
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className={`p-3 rounded-lg shadow-lg ${
+          theme === 'dark' ? 'bg-gray-800' : 'bg-white'
+        } border ${
+          theme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        }`}>
+          <p className="font-medium">{label}</p>
+          <p className="text-sm">
+            Count: <span className="font-semibold">{payload[0].value}</span>
+          </p>
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
-    <div className="w-full h-[300px] sm:h-[400px]">
-      <ResponsiveContainer>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full h-[400px] p-4"
+    >
+      <div className="flex items-center justify-center mb-6">
+        <Star className="h-6 w-6 text-yellow-400 mr-2" />
+        <h3 className={`text-xl font-semibold ${
+          theme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+        }`}>
+          Star Rating Distribution
+        </h3>
+      </div>
+
+      <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={chartData}
-          margin={{ top: 10, right: 20, bottom: 30, left: 10 }}
-          barCategoryGap="10%"
+          data={processedData}
+          margin={{
+            top: 20,
+            right: 30,
+            left: 20,
+            bottom: 5,
+          }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#555" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={theme === 'dark' ? '#374151' : '#e5e7eb'}
+          />
           <XAxis
-            dataKey="star"  
-            tick={{ fontSize: 14, fill: '#fff' }}
-            label={{ value: 'Star Rating', position: 'bottom', fill: '#fff', fontSize: 16, offset: 10 }}
+            dataKey="label"
+            stroke={theme === 'dark' ? '#9ca3af' : '#4b5563'}
+            tick={{ fill: theme === 'dark' ? '#9ca3af' : '#4b5563' }}
           />
           <YAxis
-            tick={{ fontSize: 14, fill: '#fff' }}
-            label={{ value: 'Count', angle: -90, position: 'insideLeft', fill: '#fff', fontSize: 16 }}
-            allowDecimals={false}
+            stroke={theme === 'dark' ? '#9ca3af' : '#4b5563'}
+            tick={{ fill: theme === 'dark' ? '#9ca3af' : '#4b5563' }}
           />
-          <Tooltip
-            contentStyle={{ backgroundColor: '#111', border: 'none' }}
-            labelStyle={{ color: '#fff' }}
-            itemStyle={{ color: '#fff' }}
-          />
-          <Bar dataKey="count" barSize={30} radius={[4, 4, 0, 0]}>
-            {chartData.map((entry, index) => {
-              const color = starColors[entry.star] || '#f87171';
-              return <Cell key={`cell-${index}`} fill={color} />;
-            })}
+          <Tooltip content={<CustomTooltip />} />
+          <Bar
+            dataKey="count"
+            fill={theme === 'dark' ? '#3b82f6' : '#2563eb'}
+            radius={[4, 4, 0, 0]}
+            animationDuration={1000}
+          >
+            {processedData.map((entry, index) => (
+              <motion.cell
+                key={`cell-${index}`}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                fill={getStarColor(entry.label)}
+              />
+            ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-    </div>
+    </motion.div>
   );
 };
 
-export default StarBarChart;
+export default StarBarChart; 

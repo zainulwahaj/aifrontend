@@ -1,87 +1,106 @@
 import React, { useState } from 'react';
-import { HiPlay } from 'react-icons/hi';
+import { motion } from 'framer-motion';
+import { Search, ArrowRight } from 'lucide-react';
 
 const InputForm = ({ onSubmit, hidden }) => {
   const [url, setUrl] = useState('');
-  const [method, setMethod] = useState('bfs');
-  const [depth, setDepth] = useState(5);
-
-  // If hidden, animate fade out
-  const containerClass = hidden
-    ? 'animate-fadeOutDown pointer-events-none'
-    : 'animate-fadeInUp';
+  const [limit, setLimit] = useState(10);
+  const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit({ url, method, depth });
+    setError('');
+
+    if (!url) {
+      setError('Please enter a URL');
+      return;
+    }
+
+    try {
+      new URL(url);
+    } catch (err) {
+      setError('Please enter a valid URL');
+      return;
+    }
+
+    if (limit < 1 || limit > 100) {
+      setError('Limit must be between 1 and 100');
+      return;
+    }
+
+    onSubmit({ url, limit });
   };
 
+  if (hidden) return null;
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={`
-        max-w-md w-full mx-auto p-6 rounded-xl shadow-2xl
-        bg-white/80 backdrop-blur border border-red-900
-        space-y-4 transition-all duration-500
-        ${containerClass}
-      `}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="max-w-2xl mx-auto mt-8"
     >
-      <h2 className="text-2xl font-bold mb-2 text-center text-gray-800">
-        Enter Crawler Settings
-      </h2>
+      <div className="bg-white/10 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-gray-200/20">
+        <h2 className="text-2xl font-bold text-center mb-6 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+          Start Crawling
+        </h2>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="url" className="block text-sm font-medium mb-2">
+              URL to Crawl
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                id="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-white/5 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+              />
+            </div>
+          </div>
 
-      <div className="flex flex-col space-y-1">
-        <label className="font-medium text-gray-700">Start URL</label>
-        <input
-          type="text"
-          placeholder="https://example.com"
-          required
-          className="px-4 py-2 rounded border border-gray-300
-                     focus:outline-none focus:ring-2 focus:ring-red-500
-                     transition duration-300 text-gray-700"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
+          <div>
+            <label htmlFor="limit" className="block text-sm font-medium mb-2">
+              Number of Reviews to Analyze
+            </label>
+            <input
+              type="number"
+              id="limit"
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              min="1"
+              max="100"
+              className="block w-full px-3 py-3 border border-gray-300 rounded-lg bg-white/5 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300"
+            />
+          </div>
+
+          {error && (
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-red-500 text-sm"
+            >
+              {error}
+            </motion.p>
+          )}
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="submit"
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
+          >
+            Start Analysis
+            <ArrowRight className="h-5 w-5" />
+          </motion.button>
+        </form>
       </div>
-
-      <div className="flex flex-col space-y-1">
-        <label className="font-medium text-gray-700">Method</label>
-        <select
-          className="px-4 py-2 rounded border border-gray-300
-                     focus:outline-none focus:ring-2 focus:ring-red-500
-                     transition duration-300 text-gray-700"
-          value={method}
-          onChange={(e) => setMethod(e.target.value)}
-        >
-          <option value="bfs">BFS</option>
-          <option value="dfs">DFS</option>
-        </select>
-      </div>
-
-      <div className="flex flex-col space-y-1">
-        <label className="font-medium text-gray-700">Depth</label>
-        <input
-          type="number"
-          min="1"
-          className="px-4 py-2 rounded border border-gray-300
-                     focus:outline-none focus:ring-2 focus:ring-red-500
-                     transition duration-300 text-gray-700"
-          value={depth}
-          onChange={(e) => setDepth(e.target.value)}
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="w-full flex items-center justify-center gap-2
-                   bg-red-700 text-white py-2 rounded-xl
-                   hover:bg-red-800 transition-all duration-300
-                   transform hover:scale-105 font-semibold"
-      >
-        <HiPlay />
-        Start Crawl
-      </button>
-    </form>
+    </motion.div>
   );
 };
 
