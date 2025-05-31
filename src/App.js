@@ -176,150 +176,91 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen w-full ${
+      className={`min-h-screen w-full flex flex-col justify-center items-center px-2 sm:px-4 ${
         theme === 'dark'
           ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-gray-200'
           : 'bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 text-gray-800'
       } transition-colors duration-300`}
+      style={{ boxSizing: 'border-box' }}
     >
-      {/* Header */}
-      <motion.header 
-        initial={{ opacity: 0 }}
-        animate={{ 
-          opacity: 1,
-          height: formHidden ? '120px' : '40vh',
-          padding: formHidden ? '1rem' : '2rem'
+      {/* Header + Form Group */}
+      <motion.div
+        initial={{ scale: 1, y: 0 }}
+        animate={{
+          scale: formHidden ? 0.6 : 1,
+          y: formHidden ? -120 : 0,
+          transition: { type: 'spring', stiffness: 80, damping: 18 }
         }}
-        transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="w-full flex items-center justify-center relative overflow-hidden"
+        className="w-full flex flex-col items-center justify-center text-center gap-y-2 md:gap-y-4 max-w-xs sm:max-w-md md:max-w-xl px-2 sm:px-4"
+        style={{ zIndex: 10 }}
       >
-        <button
-          onClick={toggleTheme}
-          className="absolute right-4 top-4 p-2 rounded-full hover:bg-opacity-20 hover:bg-gray-500 transition-all duration-300 z-50"
-          style={{ zIndex: 1000 }}
+        <motion.h1
+          className={`font-extrabold tracking-tight bg-clip-text text-transparent uppercase text-center leading-tight drop-shadow-2xl select-none text-[12vw] sm:text-7xl md:text-8xl ${
+            theme === 'dark'
+              ? 'bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500'
+              : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'
+          }`}
+          animate={{
+            backgroundPosition: [
+              '0% 50%',
+              '100% 50%',
+              '0% 50%'
+            ],
+            textShadow: [
+              '0 0 40px #6366f1, 0 0 80px #a21caf',
+              '0 0 80px #a21caf, 0 0 40px #6366f1',
+              '0 0 40px #6366f1, 0 0 80px #a21caf'
+            ]
+          }}
+          transition={{
+            backgroundPosition: {
+              duration: 6,
+              repeat: Infinity,
+              repeatType: 'reverse'
+            },
+            textShadow: {
+              duration: 2,
+              repeat: Infinity,
+              repeatType: 'reverse'
+            }
+          }}
+          style={{
+            backgroundSize: '200% 200%',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: 0,
+          }}
         >
-          {theme === 'dark' ? <Sun className="text-yellow-400" /> : <Moon className="text-gray-600" />}
-        </button>
-
-        <div className="w-full max-w-4xl mx-auto px-4 flex flex-col items-center justify-center text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0,
-              scale: formHidden ? 0.7 : 1
-            }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="relative w-full flex flex-col items-center"
-          >
-            <motion.h1
-              className={`text-6xl md:text-8xl font-black tracking-tighter bg-clip-text text-transparent uppercase text-center ${
-                theme === 'dark'
-                  ? 'bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500'
-                  : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'
-              }`}
-              animate={{
-                backgroundPosition: ['0%', '100%'],
-                textShadow: [
-                  '0 0 10px rgba(59, 130, 246, 0.5)',
-                  '0 0 20px rgba(59, 130, 246, 0.5)',
-                  '0 0 10px rgba(59, 130, 246, 0.5)'
-                ],
-                fontSize: formHidden ? '2.5rem' : 'inherit'
-              }}
-              transition={{
-                backgroundPosition: {
-                  duration: 5,
-                  repeat: Infinity,
-                  repeatType: "reverse"
-                },
-                textShadow: {
-                  duration: 2,
-                  repeat: Infinity,
-                  repeatType: "reverse"
-                },
-                fontSize: {
-                  duration: 0.5,
-                  ease: "easeInOut"
-                }
-              }}
-              style={{
-                backgroundSize: '200% auto',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}
-            >
-              CRAWL.AI
-            </motion.h1>
-
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl -z-10"
-              animate={{
-                opacity: [0.5, 0.8, 0.5],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            />
-
-            <motion.div
-              className="absolute -inset-1 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-2xl -z-20"
-              animate={{
-                opacity: [0.3, 0.6, 0.3],
-                scale: [1.1, 1, 1.1],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            />
-          </motion.div>
-
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ 
-              opacity: formHidden ? 0 : 1, 
-              y: 0,
-              height: formHidden ? 0 : 'auto',
-              marginTop: formHidden ? 0 : '1.5rem'
-            }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className={`text-lg md:text-xl font-medium text-center w-full ${
-              theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-            }`}
-          >
-            <motion.span
-              animate={{
-                opacity: [0.5, 1, 0.5],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatType: "reverse"
-              }}
-            >
-              AI Powered Web Crawler
-            </motion.span>
-          </motion.p>
+          CRAWL.AI
+        </motion.h1>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          className={`text-xs sm:text-base md:text-lg font-medium text-center w-full select-none ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}
+          style={{ marginBottom: 0 }}
+        >
+          AI Powered Web Crawler
+        </motion.p>
+        {/* InputForm and rest of app */}
+        <div className="w-full flex flex-col items-center justify-center">
+          <AnimatePresence mode="wait">
+            {!jobId && !loading && !errorMsg && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="w-full"
+              >
+                <InputForm onSubmit={handleAnalyse} hidden={formHidden} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </motion.header>
+      </motion.div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl w-full mx-auto px-2 sm:px-4 lg:px-8">
         <AnimatePresence mode="wait">
-          {!jobId && !loading && !errorMsg && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-            >
-              <InputForm onSubmit={handleAnalyse} hidden={formHidden} />
-            </motion.div>
-          )}
-
           {loading && (
             <motion.div
               initial={{ opacity: 0 }}
