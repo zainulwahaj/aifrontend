@@ -46,7 +46,7 @@ function App() {
     setJobId(null);
 
     try {
-      const response = await axios.post('https://scrapvision.onrender.com/analyse', {
+      const response = await axios.post('https://scrapvision-app-75184386a6fb.herokuapp.com/analyse', {
         urls: [url],
         limit: Number(limit),
       });
@@ -67,7 +67,7 @@ function App() {
   const handleCancel = async () => {
     if (jobId) {
       try {
-        await axios.post(`https://scrapvision.onrender.com/cancel/${jobId}`);
+        await axios.post(`https://scrapvision-app-75184386a6fb.herokuapp.com/cancel/${jobId}`);
       } catch (err) {
         console.error('Error canceling job:', err);
       }
@@ -89,7 +89,7 @@ function App() {
 
     const fetchStatus = async () => {
       try {
-        const response = await axios.get(`https://scrapvision.onrender.com/status/${jobId}`);
+        const response = await axios.get(`https://scrapvision-app-75184386a6fb.herokuapp.com/status/${jobId}`);
         const { status, results: newResults, error } = response.data;
 
         if (error) {
